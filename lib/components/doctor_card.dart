@@ -1,17 +1,14 @@
 import 'package:doctor_appointment_app_with_laravel_backend/utils/config.dart';
 import 'package:flutter/material.dart';
 
-class DoctorCard extends StatefulWidget {
-  const DoctorCard({super.key});
+class DoctorCard extends StatelessWidget {
+  const DoctorCard({Key? key, required this.route}) : super(key: key);
 
-  @override
-  State<DoctorCard> createState() => _DoctorCardState();
-}
+  final String route;
 
-class _DoctorCardState extends State<DoctorCard> {
-  Config config = Config();
   @override
   Widget build(BuildContext context) {
+    Config.init(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
       height: 150,
@@ -37,16 +34,18 @@ class _DoctorCardState extends State<DoctorCard> {
                   children: <Widget>[
                     Text(
                       'Dr. Richard Tan',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     Text(
                       'Dentist',
-                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.normal),
+                      style: TextStyle(
+                          fontSize: 14, fontWeight: FontWeight.normal),
                     ),
                     Spacer(),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
-                      children: const <Widget>[
+                      children: <Widget>[
                         Icon(
                           Icons.star_border,
                           color: Colors.yellow,
@@ -75,7 +74,9 @@ class _DoctorCardState extends State<DoctorCard> {
             ],
           ),
         ),
-        onTap: () {}, // navigate to doctor detail page
+        onTap: () {
+          Navigator.of(context).pushNamed(route);
+        }, // navigate to doctor detail page
       ),
     );
   }

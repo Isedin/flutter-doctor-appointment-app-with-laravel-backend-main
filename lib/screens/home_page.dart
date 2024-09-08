@@ -55,12 +55,14 @@ class _HomePageState extends State<HomePage> {
                   children: <Widget>[
                     Text(
                       'Amanda', // user name
-                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                     ),
                     SizedBox(
                       child: CircleAvatar(
                         radius: 30,
-                        backgroundImage: AssetImage('android/assets/profile1.jpg'),
+                        backgroundImage:
+                            AssetImage('android/assets/profile1.jpg'),
                       ),
                     )
                   ],
@@ -82,7 +84,8 @@ class _HomePageState extends State<HomePage> {
                         margin: const EdgeInsets.only(right: 20),
                         color: Config.primaryColor,
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 15, vertical: 10),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: <Widget>[
@@ -94,7 +97,8 @@ class _HomePageState extends State<HomePage> {
                                 width: 20,
                               ),
                               Text(medCat[index]['category'],
-                                  style: const TextStyle(fontSize: 16, color: Colors.white)),
+                                  style: const TextStyle(
+                                      fontSize: 16, color: Colors.white)),
                             ],
                           ),
                         ),
@@ -108,7 +112,6 @@ class _HomePageState extends State<HomePage> {
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 Config.spaceSmall,
-                // display appointment list
                 AppointmentCard(),
                 Config.spaceSmall,
                 const Text(
@@ -118,7 +121,9 @@ class _HomePageState extends State<HomePage> {
                 Config.spaceSmall,
                 Column(
                   children: List.generate(10, (index) {
-                    return DoctorCard();
+                    return DoctorCard(
+                      route: 'doctor_details',
+                    );
                   }),
                 )
               ],

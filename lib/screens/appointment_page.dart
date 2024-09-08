@@ -47,26 +47,15 @@ class _AppointmentPageState extends State<AppointmentPage> {
   @override
   Widget build(BuildContext context) {
     List<dynamic> filteredSchedules = schedules.where((var schedule) {
-      // switch (schedule['status']) {
-      //   case 'upcoming':
-      //     schedule['status'] = FilterStatus.upcoming;
-      //     break;
-      //   case 'complete':
-      //     schedule['status'] = FilterStatus.complete;
-      //     break;
-      //   case 'cancel':
-      //     schedule['status'] = FilterStatus.cancel;
-      //     break;
-      // }
       return schedule['status'] == status;
     }).toList();
     return SafeArea(
       child: Padding(
-        padding: EdgeInsets.only(left: 20, top: 20, right: 20),
+        padding: const EdgeInsets.only(left: 20, top: 20, right: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            Text(
+            const Text(
               'Appointment Schedule',
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -135,7 +124,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
                     child: Center(
                       child: Text(
                         status.name,
-                        style: TextStyle(
+                        style: const TextStyle(
                             color: Colors.white, fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -155,7 +144,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
                         side: const BorderSide(color: Colors.grey),
                         borderRadius: BorderRadius.circular(20)),
                     margin: !isLastElement
-                        ? EdgeInsets.only(bottom: 20)
+                        ? const EdgeInsets.only(bottom: 20)
                         : EdgeInsets.zero,
                     child: Padding(
                       padding: const EdgeInsets.all(15),
@@ -177,7 +166,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
                                 children: [
                                   Text(
                                     _schedule['doctor_name'],
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       color: Colors.black,
                                       fontWeight: FontWeight.w700,
                                     ),
@@ -185,7 +174,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
                                   const SizedBox(height: 5),
                                   Text(
                                     _schedule['category'],
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                         color: Colors.grey,
                                         fontSize: 12,
                                         fontWeight: FontWeight.w600),
@@ -208,7 +197,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
                               Expanded(
                                 child: OutlinedButton(
                                   onPressed: () {},
-                                  child: Text(
+                                  child: const Text(
                                     'Cancel',
                                     style:
                                         TextStyle(color: Config.primaryColor),
@@ -224,7 +213,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
                                     backgroundColor: Config.primaryColor,
                                   ),
                                   onPressed: () {},
-                                  child: Text(
+                                  child: const Text(
                                     'Reschedule',
                                     style: TextStyle(color: Colors.white),
                                   ),
@@ -258,7 +247,7 @@ class ScheduleCard extends StatelessWidget {
       ),
       width: double.infinity,
       padding: const EdgeInsets.all(20),
-      child: Row(
+      child: const Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
@@ -275,7 +264,7 @@ class ScheduleCard extends StatelessWidget {
             style: TextStyle(color: Config.primaryColor),
           ),
           SizedBox(
-            width: 20,
+            width: 10,
           ),
           Icon(
             Icons.access_alarm,
