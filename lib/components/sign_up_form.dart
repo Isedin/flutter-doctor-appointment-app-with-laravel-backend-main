@@ -1,20 +1,21 @@
+import 'package:flutter/material.dart';
 import 'package:doctor_appointment_app_with_laravel_backend/components/button.dart';
 import 'package:doctor_appointment_app_with_laravel_backend/main.dart';
 import 'package:doctor_appointment_app_with_laravel_backend/models/auth_model.dart';
 import 'package:doctor_appointment_app_with_laravel_backend/providers/dio_provider.dart';
 import 'package:doctor_appointment_app_with_laravel_backend/utils/config.dart';
-import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class LoginForm extends StatefulWidget {
-  const LoginForm({super.key});
+class SignUpForm extends StatefulWidget {
+  const SignUpForm({super.key});
 
   @override
-  State<LoginForm> createState() => _LoginFormState();
+  State<SignUpForm> createState() => _SignUpFormState();
 }
 
-class _LoginFormState extends State<LoginForm> {
+class _SignUpFormState extends State<SignUpForm> {
   final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passController = TextEditingController();
   bool obsecurePass = true;
@@ -25,6 +26,18 @@ class _LoginFormState extends State<LoginForm> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
+          TextFormField(
+            controller: _nameController,
+            keyboardType: TextInputType.text,
+            cursorColor: Config.primaryColor,
+            decoration: const InputDecoration(
+              hintText: 'Username',
+              labelText: 'Username',
+              alignLabelWithHint: true,
+              prefixIcon: Icon(Icons.person_outlined),
+              prefixIconColor: Config.primaryColor,
+            ),
+          ),
           Config.spaceSmall,
           TextFormField(
             controller: _emailController,
@@ -69,17 +82,25 @@ class _LoginFormState extends State<LoginForm> {
             builder: (context, auth, child) {
               return Button(
                 width: double.infinity,
-                title: 'Sign In',
-                disable: false,
+                title: 'Sign Up',
                 onPressed: () async {
-                  //login here
-                  final token = await DioProvider().getToken(_emailController.text, _passController.text);
-                  if (token) {
-                    auth.loginSuccess();
-                    MyApp.navigatorKey.currentState!.pushNamed('main');
-                    // Navigator.of(context).pushNamed('main');
+                  final userRegistration = await DioProvider()
+                      .registerUser(_nameController.text, _emailController.text, _passController.text);
+
+                  //if register success, proceed to login
+                  if (userRegistration) {
+                    final token = await DioProvider().getToken(_emailController.text, _passController.text);
+
+                    if (token) {
+                      auth.loginSuccess(); //update login status
+                      //rediret to main page
+                      MyApp.navigatorKey.currentState!.pushNamed('main');
+                    }
+                  } else {
+                    print('register not successful');
                   }
                 },
+                disable: false,
               );
             },
           ),

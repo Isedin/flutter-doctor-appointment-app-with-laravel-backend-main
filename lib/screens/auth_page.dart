@@ -1,4 +1,5 @@
 import 'package:doctor_appointment_app_with_laravel_backend/components/login_form.dart';
+import 'package:doctor_appointment_app_with_laravel_backend/components/sign_up_form.dart';
 import 'package:doctor_appointment_app_with_laravel_backend/components/social_button.dart';
 import 'package:doctor_appointment_app_with_laravel_backend/utils/config.dart';
 import 'package:doctor_appointment_app_with_laravel_backend/utils/text.dart';
@@ -12,6 +13,7 @@ class AuthPage extends StatefulWidget {
 }
 
 class _AuthPageState extends State<AuthPage> {
+  bool isSignedIn = true;
   @override
   Widget build(BuildContext context) {
     Config.init(context);
@@ -30,21 +32,23 @@ class _AuthPageState extends State<AuthPage> {
               ),
               Config.spaceSmall,
               Text(
-                AppText.enText['signIn_text']!,
+                isSignedIn ? AppText.enText['signIn_text']! : AppText.enText['signUp_text']!,
                 style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               Config.spaceSmall,
               // login components here
-              const LoginForm(),
+              isSignedIn ? LoginForm() : SignUpForm(),
               Config.spaceSmall,
-              Center(
-                child: TextButton(
-                    onPressed: () {},
-                    child: Text(
-                      AppText.enText['forgot_password']!,
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black),
-                    )),
-              ),
+              isSignedIn
+                  ? Center(
+                      child: TextButton(
+                          onPressed: () {},
+                          child: Text(
+                            AppText.enText['forgot_password']!,
+                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black),
+                          )),
+                    )
+                  : Container(),
               // add social button sign in
               const Spacer(),
               Center(
@@ -66,11 +70,18 @@ class _AuthPageState extends State<AuthPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Text(
-                    AppText.enText['signUp_text']!,
+                    isSignedIn ? AppText.enText['signIn_text']! : AppText.enText['signUp_text']!,
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.normal, color: Colors.grey.shade500),
                   ),
-                  const Text('Sign Up',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black)),
+                  TextButton(
+                    onPressed: () {
+                      setState(() {
+                        isSignedIn = !isSignedIn;
+                      });
+                    },
+                    child: Text(isSignedIn ? 'Sign Up' : 'Sign In',
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black)),
+                  ),
                 ],
               )
             ],
