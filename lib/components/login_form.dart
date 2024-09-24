@@ -1,7 +1,10 @@
 import 'package:doctor_appointment_app_with_laravel_backend/components/button.dart';
+import 'package:doctor_appointment_app_with_laravel_backend/main.dart';
+import 'package:doctor_appointment_app_with_laravel_backend/models/auth_model.dart';
 import 'package:doctor_appointment_app_with_laravel_backend/providers/dio_provider.dart';
 import 'package:doctor_appointment_app_with_laravel_backend/utils/config.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class LoginForm extends StatefulWidget {
   const LoginForm({super.key});
@@ -61,17 +64,22 @@ class _LoginFormState extends State<LoginForm> {
           ),
           Config.spaceSmall,
           // login button
-          Button(
-            width: double.infinity,
-            title: 'Sign In',
-            disable: false,
-            onPressed: () async {
-              //login here
-              final token = await DioProvider().getToken(_emailController.text, _passController.text);
-
-              final user = await DioProvider().getUser(token);
-              print(user);
-              // Navigator.of(context).pushNamed('main');
+          Consumer<AuthModel>(
+            builder: (context, auth, child) {
+              return Button(
+                width: double.infinity,
+                title: 'Sign In',
+                disable: false,
+                onPressed: () async {
+                  //login here
+                  final token = await DioProvider().getToken(_emailController.text, _passController.text);
+                  if (token) {
+                    auth.loginSuccess();
+                    MyApp.navigatorKey.currentState!.pushNamed('main');
+                    // Navigator.of(context).pushNamed('main');
+                  }
+                },
+              );
             },
           ),
         ],
