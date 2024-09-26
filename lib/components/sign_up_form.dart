@@ -99,7 +99,10 @@ class _SignUpFormState extends State<SignUpForm> {
                   //if register success, proceed to login
                   if (userRegistration is! DioException) {
                     print('test');
-                    final token = await DioProvider().getToken(_emailController.text, _passController.text);
+                    final token = await DioProvider().getToken(
+                      _emailController.text,
+                      _passController.text,
+                    );
 
                     if (token) {
                       auth.loginSuccess(); //update login status

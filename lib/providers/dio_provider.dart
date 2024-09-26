@@ -12,6 +12,7 @@ class DioProvider {
   // get token
   Future<dynamic> getToken(String email, String password) async {
     try {
+      //here we have redirect to the server 10.0.2.2:8000 because otherwise the app will try to connect to the emulator itself and not the server
       dio.options.followRedirects = true;
       var response = await dio.post('http://10.0.2.2:8000/api/login', data: {
         'email': email,
