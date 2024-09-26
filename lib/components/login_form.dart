@@ -25,7 +25,6 @@ class _LoginFormState extends State<LoginForm> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
-          Config.spaceSmall,
           TextFormField(
             controller: _emailController,
             keyboardType: TextInputType.emailAddress,
@@ -70,16 +69,16 @@ class _LoginFormState extends State<LoginForm> {
               return Button(
                 width: double.infinity,
                 title: 'Sign In',
-                disable: false,
                 onPressed: () async {
                   //login here
                   final token = await DioProvider().getToken(_emailController.text, _passController.text);
                   if (token) {
-                    auth.loginSuccess();
+                    auth.loginSuccess(); // update login status
+                    //redirect to main page
                     MyApp.navigatorKey.currentState!.pushNamed('main');
-                    // Navigator.of(context).pushNamed('main');
                   }
                 },
+                disable: false,
               );
             },
           ),

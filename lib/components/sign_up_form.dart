@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:doctor_appointment_app_with_laravel_backend/components/button.dart';
 import 'package:doctor_appointment_app_with_laravel_backend/main.dart';
@@ -84,11 +87,18 @@ class _SignUpFormState extends State<SignUpForm> {
                 width: double.infinity,
                 title: 'Sign Up',
                 onPressed: () async {
-                  final userRegistration = await DioProvider()
-                      .registerUser(_nameController.text, _emailController.text, _passController.text);
-
+                  log('name: ${_nameController.text}');
+                  log('email: ${_emailController.text}');
+                  log('password: ${_passController.text}');
+                  final userRegistration = await DioProvider().registerUser(
+                    _nameController.text,
+                    _emailController.text,
+                    _passController.text,
+                  );
+                  log('register: $userRegistration');
                   //if register success, proceed to login
-                  if (userRegistration) {
+                  if (userRegistration is! DioException) {
+                    print('test');
                     final token = await DioProvider().getToken(_emailController.text, _passController.text);
 
                     if (token) {

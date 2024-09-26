@@ -1,6 +1,7 @@
 // in order to connect to database, we have to create dio provider first to post/get data fron laravel database. Since we use laravel sanctum, an API Token is needed for getting data from database.
 
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -36,6 +37,7 @@ class DioProvider {
 //get user data
   Future<dynamic> getUser(String token) async {
     try {
+      dio.options.followRedirects = true;
       var user =
           await dio.get('http://10.0.2.2:8000/api/user', options: Options(headers: {'Authorization': 'Bearer $token'}));
       // if request successfully, then return user data
@@ -50,12 +52,23 @@ class DioProvider {
 //register new user
   Future<dynamic> registerUser(String username, String email, String password) async {
     try {
-      var user = await dio
-          .post('http://10.0.2.2:8000/api/register', data: {'email': email, 'name': username, 'password': password});
-      // if request successfully, then return true
-      if (user.statusCode == 200 && user.data != '') {
+      dio.options.followRedirects = true;
+      // dio.options.validateStatus = (status) {
+      //   return (status ?? 500) < 500;
+      // };
+      var user = await dio.post('http://10.0.2.2:8000/api/register', data: {
+        'name': username,
+        'email': email,
+        'password': password,
+      });
+      // if register successfully, then return true
+      if (user.statusCode == 201 && user.data != '') {
         return true;
       } else {
+        log('statusCode: ${user.statusCode}');
+        if (user.statusCode == 302) {
+          log(user.headers.toString());
+        }
         return false;
       }
     } catch (error) {

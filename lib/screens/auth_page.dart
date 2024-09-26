@@ -32,7 +32,7 @@ class _AuthPageState extends State<AuthPage> {
               ),
               Config.spaceSmall,
               Text(
-                isSignedIn ? AppText.enText['signIn_text']! : AppText.enText['signUp_text']!,
+                isSignedIn ? AppText.enText['signIn_text']! : AppText.enText['register_text']!,
                 style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               Config.spaceSmall,
@@ -70,7 +70,7 @@ class _AuthPageState extends State<AuthPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Text(
-                    isSignedIn ? AppText.enText['signIn_text']! : AppText.enText['signUp_text']!,
+                    isSignedIn ? AppText.enText['signUp_text']! : AppText.enText['registered_text']!,
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.normal, color: Colors.grey.shade500),
                   ),
                   TextButton(
