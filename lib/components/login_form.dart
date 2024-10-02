@@ -76,6 +76,11 @@ class _LoginFormState extends State<LoginForm> {
                     auth.loginSuccess(); // update login status
                     //redirect to main page
                     MyApp.navigatorKey.currentState!.pushNamed('main');
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      content: Text('Invalid email or password'),
+                      backgroundColor: Colors.red,
+                    ));
                   }
                 },
                 disable: false,

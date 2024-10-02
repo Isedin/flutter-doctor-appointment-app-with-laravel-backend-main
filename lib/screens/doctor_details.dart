@@ -52,16 +52,20 @@ class _DoctorDetailsState extends State<DoctorDetails> {
           ),
           const Spacer(),
           Padding(
-              padding: const EdgeInsets.all(15),
-              child: Button(
-                width: double.infinity,
-                title: 'Book Appointment',
-                disable: false,
-                onPressed: () {
-                  //navigate to appointment page
-                  Navigator.of(context).pushNamed('booking_page');
-                },
-              ))
+            padding: const EdgeInsets.all(15),
+            child: Button(
+              width: double.infinity,
+              title: 'Book Appointment',
+              onPressed: () {
+                //pass doctor id for booking process
+                Navigator.of(context).pushNamed('booking_page', arguments: {
+                  'doctor_id': doctor['doc_id'],
+                  // 'doctor_name': doctor['doctor_name'],
+                });
+              },
+              disable: false,
+            ),
+          )
         ],
       )),
     );
@@ -141,7 +145,7 @@ class DetailBody extends StatelessWidget {
     Config.init(context);
     return Container(
       padding: const EdgeInsets.all(10),
-      margin: const EdgeInsets.only(bottom: 20),
+      // margin: const EdgeInsets.only(bottom: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
@@ -224,7 +228,7 @@ class InfoCard extends StatelessWidget {
           color: Config.primaryColor,
           borderRadius: BorderRadius.circular(15),
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
         child: Column(
           children: <Widget>[
             Text(
