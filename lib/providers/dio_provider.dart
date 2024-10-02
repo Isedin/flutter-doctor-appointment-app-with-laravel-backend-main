@@ -80,12 +80,28 @@ class DioProvider {
 //store booking details
   Future<dynamic> bookAppointment(String date, String day, String time, int doctor, String token) async {
     try {
-    dio.options.followRedirects = true;
+      dio.options.followRedirects = true;
       var response = await dio.post('http://10.0.2.2:8000/api/book',
           data: {'date': date, 'day': day, 'time': time, 'doctor_id': doctor},
           options: Options(headers: {'Authorization': 'Bearer $token'}));
-      if (response.statusCode == 200 && response.data != 'data') {
+      if (response.statusCode == 200 && response.data != '') {
         return response.statusCode;
+      } else {
+        return 'Error';
+      }
+    } catch (error) {
+      return error;
+    }
+  }
+
+//retrieve booking details
+  Future<dynamic> getAppointments(String token) async {
+    try {
+      dio.options.followRedirects = true;
+      var response = await dio.get('http://10.0.2.2:8000/api/appointments',
+          options: Options(headers: {'Authorization': 'Bearer $token'}));
+      if (response.statusCode == 200 && response.data != '') {
+        return json.encode(response.data);
       } else {
         return 'Error';
       }

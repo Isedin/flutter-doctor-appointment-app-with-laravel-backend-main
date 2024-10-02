@@ -22,6 +22,7 @@ class _MainLayoutState extends State<MainLayout> {
         onPageChanged: ((value) {
           setState(() {
             currentPage = value;
+            
           });
         }),
         children: const <Widget>[
