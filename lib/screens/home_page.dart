@@ -16,7 +16,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  Map<String, dynamic> user = {};
+  Map<String, dynamic>? user = {};
+  Map<String, dynamic>? doctor = {};
   List<Map<String, dynamic>> medCat = [
     {
       "icon": FontAwesomeIcons.userDoctor,
@@ -58,6 +59,14 @@ class _HomePageState extends State<HomePage> {
           //json decode
           user = json.decode(response);
           print('user: $user');
+
+          // check if any appointment today
+          for (var doctorData in user!['doctor']) {
+            // if there is appointment return for today, then pass the doctor info
+            if (doctorData['appointment'] != '') {
+              doctor = doctorData;
+            }
+          }
         });
       } else {
         print('error get user data');
@@ -76,7 +85,7 @@ class _HomePageState extends State<HomePage> {
     Config.init(context);
     return Scaffold(
       // if user is empty show loading indicator
-      body: user.isEmpty
+      body: user!.isEmpty
           ? const Center(
               child: CircularProgressIndicator(),
             )
@@ -92,7 +101,7 @@ class _HomePageState extends State<HomePage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
                           Text(
-                            user['name'] ?? 'No User', // user name
+                            user!['name'] ?? 'No User', // user name
                             style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(
@@ -146,7 +155,28 @@ class _HomePageState extends State<HomePage> {
                         style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                       Config.spaceSmall,
-                      const AppointmentCard(),
+                      doctor!.isNotEmpty
+                          //pass appointment details here
+                          ? AppointmentCard(
+                              doctor: doctor,
+                              color: Config.primaryColor,
+                            )
+                          : Container(
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade300,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: const Center(
+                                child: Padding(
+                                  padding: EdgeInsets.all(20),
+                                  child: Text(
+                                    'No Appointment Today',
+                                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                                  ),
+                                ),
+                              ),
+                            ),
                       Config.spaceSmall,
                       const Text(
                         'Top Doctors',
@@ -155,11 +185,11 @@ class _HomePageState extends State<HomePage> {
                       Config.spaceSmall,
                       Column(
                         children: List.generate(
-                          user['doctor'].length,
+                          user!['doctor'].length,
                           (index) {
                             return DoctorCard(
                               route: 'doctor_details',
-                              doctor: user['doctor'][index],
+                              doctor: user!['doctor'][index],
                             );
                           },
                         ),
