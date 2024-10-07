@@ -2,7 +2,10 @@ import 'package:doctor_appointment_app_with_laravel_backend/utils/config.dart';
 import 'package:flutter/material.dart';
 
 class AppointmentCard extends StatefulWidget {
-  const AppointmentCard({super.key});
+  const AppointmentCard({super.key, required this.doctor, required this.color});
+
+  final Map<String, dynamic>? doctor;
+  final Color color;
 
   @override
   State<AppointmentCard> createState() => _AppointmentCardState();
@@ -11,10 +14,27 @@ class AppointmentCard extends StatefulWidget {
 class _AppointmentCardState extends State<AppointmentCard> {
   @override
   Widget build(BuildContext context) {
+    // Check if doctor is null and provide a default UI or message
+    if (widget.doctor == null) {
+      return Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: widget.color,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: const Padding(
+          padding: EdgeInsets.all(20),
+          child: Text(
+            'No doctor information available',
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
+      );
+    }
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: Config.primaryColor,
+        color: widget.color,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Material(
@@ -23,12 +43,12 @@ class _AppointmentCardState extends State<AppointmentCard> {
           padding: const EdgeInsets.all(20),
           child: Column(
             children: <Widget>[
-              const Row(
+              Row(
                 children: [
                   CircleAvatar(
-                    backgroundImage: AssetImage('android/assets/doctor_1.jpg'),
+                    backgroundImage: NetworkImage("http://10.0.2.2:8000${widget.doctor!['doctor_profile']}"),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 10,
                   ),
                   Column(
@@ -36,15 +56,15 @@ class _AppointmentCardState extends State<AppointmentCard> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Text(
-                        'Dr. Richard Tan',
-                        style: TextStyle(color: Colors.white),
+                        'Dr. ${widget.doctor!['doctor_name']}',
+                        style: const TextStyle(color: Colors.white),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 2,
                       ),
                       Text(
-                        'Dentist',
-                        style: TextStyle(color: Colors.black),
+                        widget.doctor!['category'] ?? 'Unknown Category',
+                        style: const TextStyle(color: Colors.black),
                       ),
                     ],
                   ),
@@ -52,7 +72,9 @@ class _AppointmentCardState extends State<AppointmentCard> {
               ),
               Config.spaceSmall,
               // Schedule information
-              const ScheduleCard(),
+              ScheduleCard(
+                appointment: widget.doctor!['appointments'],
+              ),
               Config.spaceSmall,
               // action button
               Row(
@@ -97,10 +119,21 @@ class _AppointmentCardState extends State<AppointmentCard> {
 
 // Schedule Widget
 class ScheduleCard extends StatelessWidget {
-  const ScheduleCard({super.key});
+  const ScheduleCard({super.key, required this.appointment});
+  final Map<String, dynamic>? appointment;
 
   @override
   Widget build(BuildContext context) {
+    // Check if appointment is null and show an empty container
+    if (appointment == null) {
+      return Container(
+        padding: const EdgeInsets.all(20),
+        child: const Text(
+          "No appointment details available",
+          style: TextStyle(color: Colors.white),
+        ),
+      );
+    }
     return Container(
       decoration: BoxDecoration(
         color: Colors.grey,
@@ -108,36 +141,36 @@ class ScheduleCard extends StatelessWidget {
       ),
       width: double.infinity,
       padding: const EdgeInsets.all(20),
-      child: const Row(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          Icon(
+          const Icon(
             Icons.calendar_today,
             color: Colors.white,
             size: 15,
           ),
-          SizedBox(
+          const SizedBox(
             width: 5,
           ),
           Text(
-            'Thursday, 05/09/2024',
-            style: TextStyle(color: Colors.white),
+            '${appointment!['day']}, ${appointment!['date']}',
+            style: const TextStyle(color: Colors.white),
           ),
-          SizedBox(
+          const SizedBox(
             width: 10,
           ),
-          Icon(
+          const Icon(
             Icons.access_alarm,
             color: Colors.white,
             size: 17,
           ),
-          SizedBox(
+          const SizedBox(
             width: 5,
           ),
           Flexible(
               child: Text(
-            '2:00 PM',
-            style: TextStyle(
+            appointment!['time'],
+            style: const TextStyle(
               color: Colors.white,
             ),
           ))
