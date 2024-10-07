@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:dio/dio.dart';
 import 'package:doctor_appointment_app_with_laravel_backend/providers/dio_provider.dart';
 import 'package:doctor_appointment_app_with_laravel_backend/utils/config.dart';
 import 'package:flutter/material.dart';
@@ -31,7 +32,10 @@ class _AppointmentPageState extends State<AppointmentPage> {
     final token = prefs.getString('token') ?? '';
     print('token = $token');
     final appointment = await DioProvider().getAppointments(token);
-    if (appointment != 'Error') {
+    if (appointment is DioException) {
+      // Handle the error (show a message or do something else)
+      print(appointment); // This will print the error message
+    } else {
       setState(() {
         schedules = json.decode(appointment);
         print('schedules: $schedules');
@@ -194,7 +198,11 @@ class _AppointmentPageState extends State<AppointmentPage> {
                             height: 15,
                           ),
                           // Schedule Card
-                          const ScheduleCard(),
+                          ScheduleCard(
+                            date: schedule['date'],
+                            day: schedule['day'],
+                            time: schedule['time'],
+                          ),
                           const SizedBox(
                             height: 15,
                           ),
@@ -242,7 +250,10 @@ class _AppointmentPageState extends State<AppointmentPage> {
 }
 
 class ScheduleCard extends StatelessWidget {
-  const ScheduleCard({super.key});
+  const ScheduleCard({super.key, required this.date, required this.day, required this.time});
+  final String date;
+  final String day;
+  final String time;
 
   @override
   Widget build(BuildContext context) {
@@ -253,7 +264,7 @@ class ScheduleCard extends StatelessWidget {
       ),
       width: double.infinity,
       padding: const EdgeInsets.all(20),
-      child: const Row(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
@@ -266,7 +277,7 @@ class ScheduleCard extends StatelessWidget {
             width: 5,
           ),
           Text(
-            'Thursday, 05/09/2024',
+            '$day, $date',
             style: TextStyle(color: Config.primaryColor),
           ),
           SizedBox(
@@ -282,7 +293,7 @@ class ScheduleCard extends StatelessWidget {
           ),
           Flexible(
               child: Text(
-            '2:00 PM',
+            time,
             style: TextStyle(
               color: Config.primaryColor,
             ),

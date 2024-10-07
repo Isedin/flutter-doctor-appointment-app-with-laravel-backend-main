@@ -14,6 +14,7 @@ class AppointmentCard extends StatefulWidget {
 class _AppointmentCardState extends State<AppointmentCard> {
   @override
   Widget build(BuildContext context) {
+    // print('appointments: ${widget.doctor!['appointment']}');
     // Check if doctor is null and provide a default UI or message
     if (widget.doctor == null) {
       return Container(
@@ -73,7 +74,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
               Config.spaceSmall,
               // Schedule information
               ScheduleCard(
-                appointment: widget.doctor!['appointments'],
+                appointment: widget.doctor!['appointment'],
               ),
               Config.spaceSmall,
               // action button
