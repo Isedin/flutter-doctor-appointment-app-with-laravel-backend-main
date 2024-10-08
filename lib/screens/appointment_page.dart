@@ -32,6 +32,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
     final token = prefs.getString('token') ?? '';
     print('token = $token');
     final appointment = await DioProvider().getAppointments(token);
+    // check if appointment is an error, and it is important to set the DioException in condition, cause otherwise it throws an error
     if (appointment is DioException) {
       // Handle the error (show a message or do something else)
       print(appointment); // This will print the error message
