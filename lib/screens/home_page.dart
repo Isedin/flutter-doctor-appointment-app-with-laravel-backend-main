@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:doctor_appointment_app_with_laravel_backend/components/appointment_card.dart';
 import 'package:doctor_appointment_app_with_laravel_backend/components/doctor_card.dart';
@@ -63,7 +64,8 @@ class _HomePageState extends State<HomePage> {
           // check if any appointment today
           for (var doctorData in user!['doctor']) {
             // if there is appointment return for today, then pass the doctor info
-            if (doctorData['appointment'] != '') {
+            if (doctorData['appointment'] != null) {
+              log('Bis hierhin sollte es klappen: ${doctorData['appointment']}');
               doctor = doctorData;
             }
           }
@@ -82,6 +84,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    log('doctor in build: $doctor');
     Config.init(context);
     return Scaffold(
       // if user is empty show loading indicator
@@ -104,10 +107,10 @@ class _HomePageState extends State<HomePage> {
                             user!['name'] ?? 'No User', // user name
                             style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                           ),
-                          const SizedBox(
+                          SizedBox(
                             child: CircleAvatar(
                               radius: 30,
-                              backgroundImage: AssetImage('android/assets/profile1.jpg'),
+                              backgroundImage: NetworkImage("http://127.0.0.1:8000${doctor!['doctor_profile']}"),
                             ),
                           )
                         ],
@@ -155,7 +158,7 @@ class _HomePageState extends State<HomePage> {
                         style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                       Config.spaceSmall,
-                      doctor!.isNotEmpty
+                      doctor != null
                           //pass appointment details here
                           ? AppointmentCard(
                               doctor: doctor,

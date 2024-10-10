@@ -1,8 +1,10 @@
+import 'package:dio/dio.dart';
 import 'package:doctor_appointment_app_with_laravel_backend/components/button.dart';
 import 'package:doctor_appointment_app_with_laravel_backend/main.dart';
 import 'package:doctor_appointment_app_with_laravel_backend/models/auth_model.dart';
 import 'package:doctor_appointment_app_with_laravel_backend/providers/dio_provider.dart';
 import 'package:doctor_appointment_app_with_laravel_backend/utils/config.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -66,24 +68,51 @@ class _LoginFormState extends State<LoginForm> {
           // login button
           Consumer<AuthModel>(
             builder: (context, auth, child) {
-              return Button(
-                width: double.infinity,
-                title: 'Sign In',
-                onPressed: () async {
-                  //login here
-                  final token = await DioProvider().getToken(_emailController.text, _passController.text);
-                  if (token) {
-                    auth.loginSuccess(); // update login status
-                    //redirect to main page
-                    MyApp.navigatorKey.currentState!.pushNamed('main');
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                      content: Text('Invalid email or password'),
-                      backgroundColor: Colors.red,
-                    ));
-                  }
-                },
-                disable: false,
+              return Column(
+                children: [
+                  Button(
+                    width: double.infinity,
+                    title: 'Sign In',
+                    onPressed: () async {
+                      //login here
+                      final token = await DioProvider().getToken(_emailController.text, _passController.text);
+                      if (token is! DioException) {
+                        auth.loginSuccess(); // update login status
+                        //redirect to main page
+                        MyApp.navigatorKey.currentState!.pushNamed('main');
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                          content: Text('Invalid email or password'),
+                          backgroundColor: Colors.red,
+                        ));
+                      }
+                    },
+                    disable: false,
+                  ),
+                  if (kDebugMode)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      child: Button(
+                        width: double.infinity,
+                        title: 'Test Sign In',
+                        onPressed: () async {
+                          //login here
+                          final token = await DioProvider().getToken('andreas@email.com', '123456789');
+                          if (token is! DioException) {
+                            auth.loginSuccess(); // update login status
+                            //redirect to main page
+                            MyApp.navigatorKey.currentState!.pushNamed('main');
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                              content: Text('Invalid email or password'),
+                              backgroundColor: Colors.red,
+                            ));
+                          }
+                        },
+                        disable: false,
+                      ),
+                    ),
+                ],
               );
             },
           ),

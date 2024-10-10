@@ -80,7 +80,7 @@ class AboutDoctor extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Config.init(context);
-    final pictureUrl = "http://10.0.2.2:8000${doctor['doctor_profile']}";
+    final pictureUrl = "http://127.0.0.1:8000${doctor['doctor_profile']}";
     log('pictureUrl: $pictureUrl');
     return Container(
       width: double.infinity,

@@ -1,5 +1,12 @@
+// import 'package:dio/dio.dart';
+import 'dart:developer';
+
+import 'package:doctor_appointment_app_with_laravel_backend/main.dart';
+import 'package:doctor_appointment_app_with_laravel_backend/providers/dio_provider.dart';
 import 'package:doctor_appointment_app_with_laravel_backend/utils/config.dart';
 import 'package:flutter/material.dart';
+import 'package:rating_dialog/rating_dialog.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AppointmentCard extends StatefulWidget {
   const AppointmentCard({super.key, required this.doctor, required this.color});
@@ -14,6 +21,7 @@ class AppointmentCard extends StatefulWidget {
 class _AppointmentCardState extends State<AppointmentCard> {
   @override
   Widget build(BuildContext context) {
+    log('doctor auf Appointment Card: ${widget.doctor}');
     // print('appointments: ${widget.doctor!['appointment']}');
     // Check if doctor is null and provide a default UI or message
     if (widget.doctor == null) {
@@ -47,7 +55,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
               Row(
                 children: [
                   CircleAvatar(
-                    backgroundImage: NetworkImage("http://10.0.2.2:8000${widget.doctor!['doctor_profile']}"),
+                    backgroundImage: NetworkImage("http://127.0.0.1:8000${widget.doctor!['doctor_profile']}"),
                   ),
                   const SizedBox(
                     width: 10,
@@ -57,14 +65,14 @@ class _AppointmentCardState extends State<AppointmentCard> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Text(
-                        'Dr. ${widget.doctor!['doctor_name']}',
+                        'Dr. ${widget.doctor?['doctor_name'] ?? 'Unknown Doctor'}',
                         style: const TextStyle(color: Colors.white),
                       ),
                       const SizedBox(
                         height: 2,
                       ),
                       Text(
-                        widget.doctor!['category'] ?? 'Unknown Category',
+                        widget.doctor?['category'] ?? 'Unknown Category',
                         style: const TextStyle(color: Colors.black),
                       ),
                     ],
@@ -101,11 +109,63 @@ class _AppointmentCardState extends State<AppointmentCard> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue,
                       ),
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return RatingDialog(
+                              initialRating: 1.0,
+                              title: const Text(
+                                'Rate the Doctor',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 25,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              message: const Text(
+                                'Please help us to rate our Doctor',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+                              ),
+                              image: const FlutterLogo(
+                                size: 100,
+                              ),
+                              submitButtonText: 'Submit',
+                              commentHint: 'Your Reviews',
+                              onSubmitted: (response) async {
+                                final SharedPreferences prefs = await SharedPreferences.getInstance();
+                                final token = prefs.getString('token') ?? '';
+
+                                try {
+                                  final rating = await DioProvider().storeReviews(
+                                      response.comment,
+                                      response.rating,
+                                      widget.doctor!['appointments']['id'], // this is appointment id
+                                      widget.doctor!['doc_id'], // this is doctor id
+                                      token);
+
+                                  if (rating == 200) {
+                                    // if successful, refresh
+                                    MyApp.navigatorKey.currentState!.pushNamed('main');
+                                  } else {
+                                    // Handle errors (e.g., show a snackbar or dialog)
+                                  }
+                                } catch (e) {
+                                  // Handle Dio or network exceptions
+                                  print('Error: $e');
+                                }
+                              },
+                            );
+                          },
+                        );
+                      },
                       child: const Text(
                         'Completed',
                         style: TextStyle(color: Colors.white),
                       ),
-                      onPressed: () {},
                     ),
                   ),
                 ],
@@ -126,7 +186,17 @@ class ScheduleCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Check if appointment is null and show an empty container
-    if (appointment == null) {
+    // if (appointment is! DioException) {
+    //   return Container(
+    //     padding: const EdgeInsets.all(20),
+    //     child: const Text(
+    //       "No appointment details available",
+    //       style: TextStyle(color: Colors.white),
+    //     ),
+    //   );
+    // }
+    log('appointment: $appointment');
+    if (appointment == null || appointment!.isEmpty) {
       return Container(
         padding: const EdgeInsets.all(20),
         child: const Text(

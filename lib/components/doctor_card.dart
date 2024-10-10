@@ -5,7 +5,7 @@ class DoctorCard extends StatelessWidget {
   const DoctorCard({Key? key, required this.route, required this.doctor}) : super(key: key);
 
   final String route;
-  final Map<String, dynamic> doctor; //receive doctor details
+  final Map<String, dynamic>? doctor; //receive doctor details
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +22,7 @@ class DoctorCard extends StatelessWidget {
               SizedBox(
                 width: Config.widthSize * 0.33,
                 child: Image.network(
-                  "http://10.0.2.2:8000${doctor['doctor_profile']}",
+                  "http://127.0.0.1:8000${doctor!['doctor_profile']}",
                   fit: BoxFit.fill,
                 ),
               ),
@@ -34,11 +34,11 @@ class DoctorCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(
-                      'Dr. ${doctor['doctor_name']}',
+                      'Dr. ${doctor!['doctor_name']}',
                       style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     Text(
-                      '${doctor['category']}',
+                      '${doctor!['category']}',
                       style: TextStyle(fontSize: 14, fontWeight: FontWeight.normal),
                     ),
                     const Spacer(),

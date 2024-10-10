@@ -12,9 +12,9 @@ class DioProvider {
   // get token
   Future<dynamic> getToken(String email, String password) async {
     try {
-      //here we have redirect to the server 10.0.2.2:8000 because otherwise the app will try to connect to the emulator itself and not the server
-      dio.options.followRedirects = true;
-      var response = await dio.post('http://10.0.2.2:8000/api/login', data: {
+      // //here we have redirect to the server 127.0.0.1:8000 because otherwise the app will try to connect to the emulator itself and not the server
+      // dio.options.followRedirects = true;
+      var response = await dio.post('http://127.0.0.1:8000/api/login', data: {
         'email': email,
         'password': password,
       });
@@ -38,9 +38,9 @@ class DioProvider {
 //get user data
   Future<dynamic> getUser(String token) async {
     try {
-      dio.options.followRedirects = true;
-      var user =
-          await dio.get('http://10.0.2.2:8000/api/user', options: Options(headers: {'Authorization': 'Bearer $token'}));
+      // dio.options.followRedirects = true;
+      var user = await dio.get('http://127.0.0.1:8000/api/user',
+          options: Options(headers: {'Authorization': 'Bearer $token'}));
       // if request successfully, then return user data
       if (user.statusCode == 200 && user.data != '') {
         return json.encode(user.data);
@@ -53,11 +53,11 @@ class DioProvider {
 //register new user
   Future<dynamic> registerUser(String username, String email, String password) async {
     try {
-      dio.options.followRedirects = true;
+      // dio.options.followRedirects = true;
       // dio.options.validateStatus = (status) {
       //   return (status ?? 500) < 500;
       // };
-      var user = await dio.post('http://10.0.2.2:8000/api/register', data: {
+      var user = await dio.post('http://127.0.0.1:8000/api/register', data: {
         'name': username,
         'email': email,
         'password': password,
@@ -80,8 +80,8 @@ class DioProvider {
 //store booking details
   Future<dynamic> bookAppointment(String date, String day, String time, int doctor, String token) async {
     try {
-      dio.options.followRedirects = true;
-      var response = await dio.post('http://10.0.2.2:8000/api/book',
+      // dio.options.followRedirects = true;
+      var response = await dio.post('http://127.0.0.1:8000/api/book',
           data: {'date': date, 'day': day, 'time': time, 'doctor_id': doctor},
           options: Options(headers: {'Authorization': 'Bearer $token'}));
       if (response.statusCode == 200 && response.data != '') {
@@ -97,11 +97,33 @@ class DioProvider {
 //retrieve booking details
   Future<dynamic> getAppointments(String token) async {
     try {
-      dio.options.followRedirects = true;
-      var response = await dio.get('http://10.0.2.2:8000/api/appointments',
+      // dio.options.followRedirects = true;
+      var response = await dio.get('http://127.0.0.1:8000/api/appointments',
           options: Options(headers: {'Authorization': 'Bearer $token'}));
       if (response.statusCode == 200 && response.data != '') {
         return json.encode(response.data);
+      } else {
+        return 'Error';
+      }
+    } catch (error) {
+      return error;
+    }
+  }
+
+  //store rating details
+  Future<dynamic> storeReviews(String reviews, double ratings, int id, int doctor, String token) async {
+    try {
+      // dio.options.followRedirects = true;
+      var response = await dio.post('http://127.0.0.1:8000/api/reviews',
+          data: {
+            'rating': ratings,
+            'review': reviews,
+            'appointment_id': id,
+            'doctor_id': doctor,
+          },
+          options: Options(headers: {'Authorization': 'Bearer $token'}));
+      if (response.statusCode == 200 && response.data != '') {
+        return response.statusCode;
       } else {
         return 'Error';
       }
