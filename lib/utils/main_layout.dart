@@ -1,5 +1,7 @@
 import 'package:doctor_appointment_app_with_laravel_backend/screens/appointment_page.dart';
+import 'package:doctor_appointment_app_with_laravel_backend/screens/fav_page.dart';
 import 'package:doctor_appointment_app_with_laravel_backend/screens/home_page.dart';
+import 'package:doctor_appointment_app_with_laravel_backend/screens/profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -22,14 +24,15 @@ class _MainLayoutState extends State<MainLayout> {
         onPageChanged: ((value) {
           setState(() {
             currentPage = value;
-            
           });
         }),
-        children: const <Widget>[
+        children: <Widget>[
           // home page
-          HomePage(),
+          const HomePage(),
+          FavPage(),
           // appointment page
-          AppointmentPage(),
+          const AppointmentPage(),
+          ProfilePage(),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -46,8 +49,16 @@ class _MainLayoutState extends State<MainLayout> {
             label: 'Home',
           ),
           BottomNavigationBarItem(
+            icon: FaIcon(FontAwesomeIcons.solidHeart),
+            label: 'Favorite',
+          ),
+          BottomNavigationBarItem(
             icon: FaIcon(FontAwesomeIcons.solidCalendarCheck),
             label: 'Appointment',
+          ),
+          BottomNavigationBarItem(
+            icon: FaIcon(FontAwesomeIcons.solidUser),
+            label: 'Profile',
           ),
         ],
       ),

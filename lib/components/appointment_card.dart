@@ -82,7 +82,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
               Config.spaceSmall,
               // Schedule information
               ScheduleCard(
-                appointment: widget.doctor!['appointment'],
+                appointment: widget.doctor!['appointments'],
               ),
               Config.spaceSmall,
               // action button

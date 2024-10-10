@@ -199,7 +199,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
                             height: 15,
                           ),
                           // Schedule Card
-                          ScheduleCard(
+                          TodayScheduleCard(
                             date: schedule['date'],
                             day: schedule['day'],
                             time: schedule['time'],
@@ -250,8 +250,8 @@ class _AppointmentPageState extends State<AppointmentPage> {
   }
 }
 
-class ScheduleCard extends StatelessWidget {
-  const ScheduleCard({super.key, required this.date, required this.day, required this.time});
+class TodayScheduleCard extends StatelessWidget {
+  const TodayScheduleCard({super.key, required this.date, required this.day, required this.time});
   final String date;
   final String day;
   final String time;
