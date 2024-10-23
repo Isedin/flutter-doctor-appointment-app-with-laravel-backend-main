@@ -1,7 +1,7 @@
 import 'package:doctor_appointment_app_with_laravel_backend/models/auth_model.dart';
 import 'package:doctor_appointment_app_with_laravel_backend/screens/auth_page.dart';
 import 'package:doctor_appointment_app_with_laravel_backend/screens/booking_page.dart';
-import 'package:doctor_appointment_app_with_laravel_backend/screens/doctor_details.dart';
+// import 'package:doctor_appointment_app_with_laravel_backend/screens/doctor_details.dart';
 import 'package:doctor_appointment_app_with_laravel_backend/screens/success_booked.dart';
 import 'package:doctor_appointment_app_with_laravel_backend/utils/config.dart';
 import 'package:doctor_appointment_app_with_laravel_backend/utils/main_layout.dart';
@@ -58,7 +58,7 @@ class MyApp extends StatelessWidget {
           // which is auth page (login and signup)
           '/': (context) => const AuthPage(),
           'main': (context) => const MainLayout(),
-          'doctor_details': (context) => const DoctorDetails(),
+          // 'doctor_details': (context) => const DoctorDetails(),
           'booking_page': (context) => BookingPage(),
           'success_booked': (context) => const AppointmentBooked(),
         },

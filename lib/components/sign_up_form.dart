@@ -8,6 +8,7 @@ import 'package:doctor_appointment_app_with_laravel_backend/models/auth_model.da
 import 'package:doctor_appointment_app_with_laravel_backend/providers/dio_provider.dart';
 import 'package:doctor_appointment_app_with_laravel_backend/utils/config.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SignUpForm extends StatefulWidget {
   const SignUpForm({super.key});
@@ -97,17 +98,32 @@ class _SignUpFormState extends State<SignUpForm> {
                   );
                   log('register: $userRegistration');
                   //if register success, proceed to login
+                  print(1);
                   if (userRegistration is! DioException) {
+                    print(2);
                     print('test');
-                    final token = await DioProvider().getToken(
+                    final tokenSuccess = await DioProvider().getToken(
                       _emailController.text,
                       _passController.text,
                     );
-
-                    if (token) {
-                      auth.loginSuccess(); //update login status
-                      //rediret to main page
-                      MyApp.navigatorKey.currentState!.pushNamed('main');
+                    log('token: $tokenSuccess');
+                    if (tokenSuccess) {
+                      print(3);
+                      final SharedPreferences prefs = await SharedPreferences.getInstance();
+                      final token = prefs.getString('token') ?? '';
+                      //get user data
+                      final newUserData = await DioProvider().getUser(token);
+                      print(newUserData);
+                      if (newUserData != null) {
+                        print(4);
+                        //update login status
+                        auth.loginSuccess(newUserData, null);
+                        //rediret to main page
+                        MyApp.navigatorKey.currentState!.pushNamed('main');
+                        // auth.loginSuccess(newUserData, {}); //update login status
+                        //rediret to main page
+                        // MyApp.navigatorKey.currentState!.pushNamed('main');
+                      }
                     }
                   } else {
                     print('register not successful');

@@ -1,26 +1,40 @@
 import 'dart:developer';
 
 import 'package:doctor_appointment_app_with_laravel_backend/components/button.dart';
+import 'package:doctor_appointment_app_with_laravel_backend/models/auth_model.dart';
+import 'package:doctor_appointment_app_with_laravel_backend/providers/dio_models.dart';
+import 'package:doctor_appointment_app_with_laravel_backend/providers/dio_provider.dart';
 // import 'package:doctor_appointment_app_with_laravel_backend/components/custom_appbar.dart';
 import 'package:doctor_appointment_app_with_laravel_backend/utils/config.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../components/custom_appbar.dart';
 
 class DoctorDetails extends StatefulWidget {
-  const DoctorDetails({super.key});
+  const DoctorDetails({super.key, required this.doctor, required this.isFav});
+
+  final DoctorModel doctor;
+  final bool isFav;
 
   @override
   State<DoctorDetails> createState() => _DoctorDetailsState();
 }
 
 class _DoctorDetailsState extends State<DoctorDetails> {
-  //for favorite button
   bool isFav = false;
+
+  @override
+  void initState() {
+    isFav = widget.isFav;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     //get doctor data from doctor card
-    final doctor = ModalRoute.of(context)!.settings.arguments as Map;
+    // final doctor = ModalRoute.of(context)!.settings.arguments as Map;
     return Scaffold(
       appBar: CustomAppbar(
         appTitle: 'Doctor Details',
@@ -28,11 +42,36 @@ class _DoctorDetailsState extends State<DoctorDetails> {
         actions: [
           //Favorite button
           IconButton(
-              onPressed: () {
-                //set state for favorite button
-                setState(() {
-                  isFav = !isFav;
-                });
+              // pressing this button adds/removes the doctor to/from favorite list
+              onPressed: () async {
+                //get latest favorite list from auth model
+                final latestFavList = Provider.of<AuthModel>(context, listen: false).getFav;
+
+                //if doctor is already in favorite list, remove it
+                if (latestFavList.contains(widget.doctor.docId)) {
+                  latestFavList.removeWhere((id) => id == widget.doctor.docId);
+                } else {
+                  //if doctor is not in favorite list, add it
+                  latestFavList.add(widget.doctor.docId);
+                }
+
+                //update favorite list in auth model and notify all widgets
+                Provider.of<AuthModel>(context, listen: false).setFavList(latestFavList);
+
+                final SharedPreferences prefs = await SharedPreferences.getInstance();
+                final token = prefs.getString('token') ?? '';
+
+                if (token.isNotEmpty && token != '') {
+                  //update favorite list in database
+                  final response = await DioProvider().storeFavDoc(token, latestFavList);
+                  //if response is successful, then  change the favorite status
+                  if (response == 200) {
+                    setState(() {
+                      isFav = !isFav;
+                    });
+                    log('favorite list updated');
+                  }
+                }
               },
               icon: FaIcon(
                 isFav ? Icons.favorite_rounded : Icons.favorite_outline,
@@ -45,10 +84,10 @@ class _DoctorDetailsState extends State<DoctorDetails> {
         children: <Widget>[
           //pass doctor data to about doctor widget
           AboutDoctor(
-            doctor: doctor,
+            doctor: widget.doctor,
           ),
           DetailBody(
-            doctor: doctor,
+            doctor: widget.doctor,
           ),
           const Spacer(),
           Padding(
@@ -59,7 +98,7 @@ class _DoctorDetailsState extends State<DoctorDetails> {
               onPressed: () {
                 //pass doctor id for booking process
                 Navigator.of(context).pushNamed('booking_page', arguments: {
-                  'doctor_id': doctor['doc_id'],
+                  'doctor_id': widget.doctor.docId,
                   // 'doctor_name': doctor['doctor_name'],
                 });
               },
@@ -75,12 +114,12 @@ class _DoctorDetailsState extends State<DoctorDetails> {
 class AboutDoctor extends StatelessWidget {
   const AboutDoctor({super.key, required this.doctor});
 
-  final Map<dynamic, dynamic> doctor;
+  final DoctorModel doctor;
 
   @override
   Widget build(BuildContext context) {
     Config.init(context);
-    final pictureUrl = "http://127.0.0.1:8000${doctor['doctor_profile']}";
+    final pictureUrl = "http://127.0.0.1:8000${doctor.doctorProfile}";
     log('pictureUrl: $pictureUrl');
     return Container(
       width: double.infinity,
@@ -95,7 +134,7 @@ class AboutDoctor extends StatelessWidget {
           ),
           Config.spaceSmall,
           Text(
-            'Dr. ${doctor['doctor_name']}',
+            'Dr. ${doctor.doctorName}',
             style: const TextStyle(
               color: Colors.black,
               fontSize: 24,
@@ -138,7 +177,7 @@ class AboutDoctor extends StatelessWidget {
 class DetailBody extends StatelessWidget {
   const DetailBody({super.key, required this.doctor});
 
-  final Map<dynamic, dynamic> doctor;
+  final DoctorModel doctor;
 
   @override
   Widget build(BuildContext context) {
@@ -151,8 +190,8 @@ class DetailBody extends StatelessWidget {
         children: <Widget>[
           Config.spaceSmall,
           DoctorInfo(
-            patients: doctor['patients'] ?? 0,
-            experience: doctor['experience'],
+            patients: doctor.patients,
+            experience: doctor.experience,
           ),
           Config.spaceMedium,
           const Text(
@@ -164,7 +203,7 @@ class DetailBody extends StatelessWidget {
           ),
           Config.spaceSmall,
           Text(
-            'Dr. ${doctor['doctor_name']} is a ${doctor['category']} in Sarawak, General Hospital, Malaysia. He has an experience of 10 years in this field. He completed MBBS from International Medical University Malaysia in 2009.',
+            'Dr. ${doctor.doctorName} is a ${doctor.category} in Sarawak, General Hospital, Malaysia. He has an experience of 10 years in this field. He completed MBBS from International Medical University Malaysia in 2009.',
             style: const TextStyle(
               fontWeight: FontWeight.w500,
               height: 1.5,

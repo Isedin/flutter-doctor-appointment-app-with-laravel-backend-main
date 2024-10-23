@@ -2,6 +2,7 @@
 import 'dart:developer';
 
 import 'package:doctor_appointment_app_with_laravel_backend/main.dart';
+import 'package:doctor_appointment_app_with_laravel_backend/providers/dio_models.dart';
 import 'package:doctor_appointment_app_with_laravel_backend/providers/dio_provider.dart';
 import 'package:doctor_appointment_app_with_laravel_backend/utils/config.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class AppointmentCard extends StatefulWidget {
   const AppointmentCard({super.key, required this.doctor, required this.color});
 
-  final Map<String, dynamic>? doctor;
+  final DoctorModel? doctor;
   final Color color;
 
   @override
@@ -24,7 +25,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
     log('doctor auf Appointment Card: ${widget.doctor}');
     // print('appointments: ${widget.doctor!['appointment']}');
     // Check if doctor is null and provide a default UI or message
-    if (widget.doctor == null) {
+    if (widget.doctor == null || (widget.doctor as Map).isEmpty) {
       return Container(
         width: double.infinity,
         decoration: BoxDecoration(
@@ -55,7 +56,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
               Row(
                 children: [
                   CircleAvatar(
-                    backgroundImage: NetworkImage("http://127.0.0.1:8000${widget.doctor!['doctor_profile']}"),
+                    backgroundImage: NetworkImage("http://127.0.0.1:8000${widget.doctor!.doctorProfile}"),
                   ),
                   const SizedBox(
                     width: 10,
@@ -65,14 +66,14 @@ class _AppointmentCardState extends State<AppointmentCard> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Text(
-                        'Dr. ${widget.doctor?['doctor_name'] ?? 'Unknown Doctor'}',
+                        'Dr. ${widget.doctor?.doctorName ?? 'Unknown Doctor'}',
                         style: const TextStyle(color: Colors.white),
                       ),
                       const SizedBox(
                         height: 2,
                       ),
                       Text(
-                        widget.doctor?['category'] ?? 'Unknown Category',
+                        widget.doctor?.category ?? 'Unknown Category',
                         style: const TextStyle(color: Colors.black),
                       ),
                     ],
@@ -82,7 +83,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
               Config.spaceSmall,
               // Schedule information
               ScheduleCard(
-                appointment: widget.doctor!['appointments'],
+                appointment : widget.doctor?.appointment ,
               ),
               Config.spaceSmall,
               // action button
@@ -143,8 +144,8 @@ class _AppointmentCardState extends State<AppointmentCard> {
                                   final rating = await DioProvider().storeReviews(
                                       response.comment,
                                       response.rating,
-                                      widget.doctor!['appointments']['id'], // this is appointment id
-                                      widget.doctor!['doc_id'], // this is doctor id
+                                      widget.doctor!.appointment!.id, // this is appointment id
+                                      widget.doctor!.docId, // this is doctor id
                                       token);
 
                                   if (rating == 200) {
@@ -181,7 +182,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
 // Schedule Widget
 class ScheduleCard extends StatelessWidget {
   const ScheduleCard({super.key, required this.appointment});
-  final Map<String, dynamic>? appointment;
+  final Appointment? appointment;
 
   @override
   Widget build(BuildContext context) {
@@ -196,7 +197,7 @@ class ScheduleCard extends StatelessWidget {
     //   );
     // }
     log('appointment: $appointment');
-    if (appointment == null || appointment!.isEmpty) {
+    if (appointment == null) {
       return Container(
         padding: const EdgeInsets.all(20),
         child: const Text(
@@ -224,7 +225,7 @@ class ScheduleCard extends StatelessWidget {
             width: 5,
           ),
           Text(
-            '${appointment!['day']}, ${appointment!['date']}',
+            '${appointment!.day}, ${appointment!.date}',
             style: const TextStyle(color: Colors.white),
           ),
           const SizedBox(
@@ -240,7 +241,7 @@ class ScheduleCard extends StatelessWidget {
           ),
           Flexible(
               child: Text(
-            appointment!['time'],
+            appointment!.time,
             style: const TextStyle(
               color: Colors.white,
             ),

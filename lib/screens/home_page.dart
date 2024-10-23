@@ -1,13 +1,14 @@
-import 'dart:convert';
+// import 'dart:convert';
 import 'dart:developer';
 
 import 'package:doctor_appointment_app_with_laravel_backend/components/appointment_card.dart';
 import 'package:doctor_appointment_app_with_laravel_backend/components/doctor_card.dart';
-import 'package:doctor_appointment_app_with_laravel_backend/providers/dio_provider.dart';
+import 'package:doctor_appointment_app_with_laravel_backend/models/auth_model.dart';
+import 'package:doctor_appointment_app_with_laravel_backend/providers/dio_models.dart';
 import 'package:doctor_appointment_app_with_laravel_backend/utils/config.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -17,8 +18,9 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  Map<String, dynamic>? user = {};
-  Map<String, dynamic>? doctor = {};
+  UserModel? user;
+  DoctorModel? doctor;
+  List<int> favList = [];
   List<Map<String, dynamic>> medCat = [
     {
       "icon": FontAwesomeIcons.userDoctor,
@@ -46,49 +48,20 @@ class _HomePageState extends State<HomePage> {
     },
   ];
 
-  Future<void> getData() async {
-    // get token from shared preferences
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token') ?? '';
-    print('token: $token');
-
-    if (token.isNotEmpty && token != '') {
-      // get user data
-      final response = await DioProvider().getUser(token);
-      if (response != null) {
-        setState(() {
-          //json decode
-          user = json.decode(response);
-          print('user: $user');
-
-          // check if any appointment today
-          for (var doctorData in user!['doctor']) {
-            // if there is appointment return for today, then pass the doctor info
-            if (doctorData['appointment'] != null) {
-              log('Bis hierhin sollte es klappen: ${doctorData['appointment']}');
-              doctor = doctorData;
-            }
-          }
-        });
-      } else {
-        print('error get user data');
-      }
-    }
-  }
-
-  @override
-  void initState() {
-    getData();
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     log('doctor in build: $doctor');
     Config.init(context);
+    final authModel = context.watch<AuthModel>();
+    user = authModel.getUser;
+    doctor = authModel.getDoctorModel;
+    favList = authModel.getFav;
+
+    print('user data is : $user');
+    print('favorite list is : $favList');
     return Scaffold(
       // if user is empty show loading indicator
-      body: user!.isEmpty
+      body: user == null
           ? const Center(
               child: CircularProgressIndicator(),
             )
@@ -104,13 +77,14 @@ class _HomePageState extends State<HomePage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
                           Text(
-                            user!['name'] ?? 'No User', // user name
+                            user!.name, // user name
                             style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                           ),
-                          SizedBox(
+                          const SizedBox(
                             child: CircleAvatar(
                               radius: 30,
-                              backgroundImage: NetworkImage("http://127.0.0.1:8000${doctor!['doctor_profile']}"),
+                              // backgroundImage: NetworkImage("http://127.0.0.1:8000:${doctor!['doctor_profile']}"),
+                              backgroundImage: AssetImage('android/assets/doctor_1.jpg'),
                             ),
                           )
                         ],
@@ -188,11 +162,13 @@ class _HomePageState extends State<HomePage> {
                       Config.spaceSmall,
                       Column(
                         children: List.generate(
-                          user!['doctor'].length,
+                          user!.doctors.length,
                           (index) {
                             return DoctorCard(
-                              route: 'doctor_details',
-                              doctor: user!['doctor'][index],
+                              // route: 'doc_details',
+                              doctor: user!.doctors[index],
+                              //if latest fav list contains particular doctor then set isFav to true
+                              isFav: favList.contains(user!.doctors[index].id) ? true : false,
                             );
                           },
                         ),

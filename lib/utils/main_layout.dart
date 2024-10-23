@@ -27,10 +27,8 @@ class _MainLayoutState extends State<MainLayout> {
           });
         }),
         children: <Widget>[
-          // home page
           const HomePage(),
-          FavPage(),
-          // appointment page
+           FavPage(),
           const AppointmentPage(),
           ProfilePage(),
         ],

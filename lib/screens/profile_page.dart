@@ -1,5 +1,8 @@
+import 'package:doctor_appointment_app_with_laravel_backend/main.dart';
+import 'package:doctor_appointment_app_with_laravel_backend/providers/dio_provider.dart';
 import 'package:doctor_appointment_app_with_laravel_backend/utils/config.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -9,8 +12,7 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  final Map<String, dynamic>? doctor = {};
-  Map<String, dynamic>? user = {};
+  // final Map<String, dynamic>? doctor = {};
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -20,30 +22,32 @@ class _ProfilePageState extends State<ProfilePage> {
           child: Container(
             width: double.infinity,
             color: Config.primaryColor,
-            child: Column(
+            child: const Column(
               children: <Widget>[
-                const SizedBox(
+                SizedBox(
                   height: 110,
                 ),
                 CircleAvatar(
                   radius: 65.0,
-                  backgroundImage: NetworkImage("http://127.0.0.1:8000${doctor!['doctor_profile']}"),
+                  backgroundImage: AssetImage('assets/images/doctor.png'),
+                  // backgroundImage: NetworkImage("http://127.0.0.1:8000${doctor!['doctor_profile']}"),
                   backgroundColor: Colors.white,
                 ),
-                const SizedBox(
+                SizedBox(
                   height: 10,
                 ),
                 Text(
-                  'Dr. ${doctor?['doctor_name'] ?? 'Unknown Doctor'}',
-                  style: const TextStyle(
+                  'Dr. Andreas',
+                  // 'Dr. ${doctor?['doctor_name'] ?? 'Unknown Doctor'}',
+                  style: TextStyle(
                     color: Colors.white,
                     fontSize: 20,
                   ),
                 ),
-                const SizedBox(
+                SizedBox(
                   height: 10,
                 ),
-                const Text(
+                Text(
                   '39 years old',
                   style: TextStyle(
                     color: Colors.white,
@@ -69,7 +73,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     child: Column(
                       children: [
                         const Text(
-                          'Personal Information',
+                          'Profile',
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w800,
@@ -114,7 +118,24 @@ class _ProfilePageState extends State<ProfilePage> {
                               width: 20,
                             ),
                             TextButton(
-                              onPressed: () {},
+                              onPressed: () async {
+                                final SharedPreferences prefs = await SharedPreferences.getInstance();
+                                final token = prefs.getString('token') ?? '';
+
+                                if (token.isNotEmpty && token != '') {
+                                  //logout here
+                                  final response = await DioProvider().logout(token);
+
+                                  if (response == 200) {
+                                    //if logout successful, remove token and navigate to login page
+                                    await prefs.remove('token');
+                                    setState(() {
+                                      //redirect to login page
+                                      MyApp.navigatorKey.currentState!.pushReplacementNamed('/');
+                                    });
+                                  }
+                                }
+                              },
                               child: const Text(
                                 'History',
                                 style: TextStyle(
@@ -130,8 +151,8 @@ class _ProfilePageState extends State<ProfilePage> {
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             Icon(
-                              Icons.login_outlined,
-                              color: Colors.blueAccent[400],
+                              Icons.logout_outlined,
+                              color: Colors.lightGreen[400],
                               size: 35,
                             ),
                             const SizedBox(

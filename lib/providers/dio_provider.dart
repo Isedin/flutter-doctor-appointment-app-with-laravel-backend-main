@@ -4,13 +4,14 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:dio/dio.dart';
+import 'package:doctor_appointment_app_with_laravel_backend/providers/dio_models.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 final dio = Dio();
 
 class DioProvider {
   // get token
-  Future<dynamic> getToken(String email, String password) async {
+  Future<bool> getToken(String email, String password) async {
     try {
       // //here we have redirect to the server 127.0.0.1:8000 because otherwise the app will try to connect to the emulator itself and not the server
       // dio.options.followRedirects = true;
@@ -28,7 +29,7 @@ class DioProvider {
         return false;
       }
     } catch (error) {
-      return error;
+      return false;
     }
   }
 
@@ -36,18 +37,21 @@ class DioProvider {
 // "api/login" is the route to get token that will be set later in laravel
 
 //get user data
-  Future<dynamic> getUser(String token) async {
-    try {
-      // dio.options.followRedirects = true;
-      var user = await dio.get('http://127.0.0.1:8000/api/user',
-          options: Options(headers: {'Authorization': 'Bearer $token'}));
-      // if request successfully, then return user data
-      if (user.statusCode == 200 && user.data != '') {
-        return json.encode(user.data);
-      }
-    } catch (error) {
-      return error;
+  Future<UserModel?> getUser(String token) async {
+    // try {
+    // dio.options.followRedirects = true;
+    var user =
+        await dio.get('http://127.0.0.1:8000/api/user', options: Options(headers: {'Authorization': 'Bearer $token'}));
+    // if request successfully, then return user data
+    print('StatusCode: ${user.statusCode}');
+    if (user.statusCode == 200 && user.data != '') {
+      print(user.data);
+      return UserModel.fromJson(user.data);
     }
+    // } catch (error) {
+    //   return null;
+    // }
+    return null;
   }
 
 //register new user
@@ -121,6 +125,42 @@ class DioProvider {
             'appointment_id': id,
             'doctor_id': doctor,
           },
+          options: Options(headers: {'Authorization': 'Bearer $token'}));
+      if (response.statusCode == 200 && response.data != '') {
+        return response.statusCode;
+      } else {
+        return 'Error';
+      }
+    } catch (error) {
+      return error;
+    }
+  }
+
+  //store favorite doctor
+  //update the favorite list into database
+  Future<dynamic> storeFavDoc(String token, List<dynamic> favList) async {
+    try {
+      // dio.options.followRedirects = true;
+      var response = await dio.post('http://127.0.0.1:8000/api/fav',
+          data: {
+            'favList': favList,
+          },
+          options: Options(headers: {'Authorization': 'Bearer $token'}));
+      if (response.statusCode == 200 && response.data != '') {
+        return response.statusCode;
+      } else {
+        return 'Error';
+      }
+    } catch (error) {
+      return error;
+    }
+  }
+
+//logout
+  Future<dynamic> logout(String token) async {
+    try {
+      // dio.options.followRedirects = true;
+      var response = await dio.post('http://127.0.0.1:8000/api/logout',
           options: Options(headers: {'Authorization': 'Bearer $token'}));
       if (response.statusCode == 200 && response.data != '') {
         return response.statusCode;
